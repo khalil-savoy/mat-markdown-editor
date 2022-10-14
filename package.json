@@ -1,11 +1,12 @@
 {
-  "name": "mat-markdown-editor",
-  "description": "Material design markdown editor",
+  "name": "@mobi/mat-markdown-editor",
+  "description": "A forked version of Material design markdown editor. demo was Updated angular version to 9",
   "version": "0.0.8",
   "homepage": "https://github.com/michaeldoye/mat-markdown-editor",
   "author": {
     "name": "Michael Doye",
-    "url": "https://github.com/michaeldoye"
+    "url": "https://github.com/michaeldoye",
+    "editor": "Robert Alvarez"
   },
   "repository": {
     "type": "git",
