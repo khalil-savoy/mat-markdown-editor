@@ -152,5 +152,8 @@
       }
     }
   },
-  "defaultProject": "mat-markdown-editor-demo"
+  "defaultProject": "mat-markdown-editor-demo",
+  "cli": {
+    "analytics": false
+  }
 }
