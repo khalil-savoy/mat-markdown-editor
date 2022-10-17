@@ -26,7 +26,7 @@ export { MatMarkdownEditorOptions, MarkedjsOption } from './lib.interface';
   declarations: [MatMarkdownEditorComponent, EditorToolbarComponent],
 })
 export class MatMarkdownEditorModule {
-  static forRoot(): ModuleWithProviders {
+  static forRoot(): ModuleWithProviders<MatMarkdownEditorModule> {
     return {
       ngModule: MatMarkdownEditorModule,
       providers: [LibService],
