@@ -45,7 +45,7 @@ declare let hljs: any;
 })
 export class MatMarkdownEditorComponent
   implements ControlValueAccessor, Validator, OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('aceEditor') public aceEditorContainer: ElementRef;
+  @ViewChild('aceEditor', { static: true }) public aceEditorContainer: ElementRef;
   @Input() public options: MatMarkdownEditorOptions;
 
   public showPreviewPanel = true;
