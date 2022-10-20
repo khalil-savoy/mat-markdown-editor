@@ -1,7 +1,7 @@
 {
   "name": "mat-markdown-editor",
   "description": "A forked version of Material design markdown editor. demo was Updated angular version to 9",
-  "version": "0.0.11",
+  "version": "0.0.8",
   "homepage": "https://github.com/michaeldoye/mat-markdown-editor",
   "author": {
     "name": "Michael Doye",
@@ -47,6 +47,7 @@
     "gulp-cli": "^2.3.0",
     "jest-cli": "^24.3.1",
     "rxjs": "~6.6.7",
+    "tsickle": "^0.39.1",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"
   },

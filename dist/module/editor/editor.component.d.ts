@@ -1,0 +1,34 @@
+import { AfterViewInit, OnInit, OnDestroy, ElementRef } from '@angular/core';
+import { ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
+import { DomSanitizer } from '@angular/platform-browser';
+import { MatMarkdownEditorOptions } from '../lib.interface';
+export declare class MatMarkdownEditorComponent implements ControlValueAccessor, Validator, OnInit, AfterViewInit, OnDestroy {
+    required: boolean;
+    maxlength: number;
+    private _domSanitizer;
+    aceEditorContainer: ElementRef;
+    options: MatMarkdownEditorOptions;
+    showPreviewPanel: boolean;
+    isFullScreen: boolean;
+    previewHtml: any;
+    editor: any;
+    private _renderMarkTimeout;
+    private _markdownValue;
+    private _options;
+    private _markedOpt;
+    private _onChange;
+    private _onTouched;
+    get markdownValue(): any;
+    set markdownValue(value: any);
+    constructor(required: boolean, maxlength: number, _domSanitizer: DomSanitizer);
+    ngOnInit(): void;
+    ngAfterViewInit(): void;
+    writeValue(value: any | Array<any>): void;
+    registerOnChange(fn: (_: any) => {}): void;
+    registerOnTouched(fn: () => {}): void;
+    validate(c: AbstractControl): ValidationErrors;
+    onTogglePreview(isOpen: boolean): void;
+    onFullScreen(isFullScreen: boolean): void;
+    previewPanelClick(event: Event): void;
+    ngOnDestroy(): any;
+}

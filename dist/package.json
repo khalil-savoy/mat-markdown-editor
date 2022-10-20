@@ -1,0 +1,51 @@
+{
+  "name": "mat-markdown-editor",
+  "version": "0.0.8",
+  "description": "A forked version of Material design markdown editor. demo was Updated angular version to 9",
+  "keywords": [
+    "markdown",
+    "text editor",
+    "angular",
+    "material design"
+  ],
+  "author": {
+    "name": "Michael Doye",
+    "url": "https://github.com/michaeldoye",
+    "editor": "Robert Alvarez"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/michaeldoye/mat-markdown-editor.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/michaeldoye/mat-markdown-editor/issues"
+  },
+  "homepage": "https://github.com/michaeldoye/mat-markdown-editor",
+  "main": "./bundles/mat-markdown-editor.umd.js",
+  "module": "./esm5/mat-markdown-editor.es5.js",
+  "es2015": "./esm2015/mat-markdown-editor.js",
+  "typings": "./mat-markdown-editor.d.ts",
+  "peerDependencies": {
+    "@angular/animations": "^9.1.13",
+    "@angular/cdk": "^9.2.4",
+    "@angular/cli": "^9.1.15",
+    "@angular/common": "^9.1.13",
+    "@angular/compiler": "^9.1.13",
+    "@angular/core": "^9.1.13",
+    "@angular/flex-layout": "^9.0.0-beta.29",
+    "@angular/forms": "^9.1.13",
+    "@angular/material": "^9.2.4",
+    "@angular/platform-browser": "^9.1.13",
+    "@angular/platform-browser-dynamic": "^9.1.13",
+    "@angular/router": "^9.1.13",
+    "core-js": "^2.5.4",
+    "gh-got": "^8.1.0",
+    "gulp-cli": "^2.3.0",
+    "jest-cli": "^24.3.1",
+    "rxjs": "^6.6.7",
+    "tsickle": "^0.39.1",
+    "tslib": "^1.10.0",
+    "zone.js": "^0.10.2"
+  }
+}

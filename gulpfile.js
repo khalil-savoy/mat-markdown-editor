@@ -1,6 +1,7 @@
+//require('@angular/compiler-cli');
+const ngFsUtils = require('@angular/compiler-cli/src/ngtsc/file_system')
 const _ = require('lodash');
 const del = require('del');
-const gulp = require('gulp');
 const acolors = require('ansi-colors');
 const fancyLog = require('fancy-log');
 const helpers = require('./config/helpers');
@@ -29,7 +30,8 @@ const jestCli = require('jest-cli');
 const runSequence = require('run-sequence');
 
 /** To compile & bundle the library with Angular & Rollup */
-const ngc = (args) => new Promise((resolve, reject)=>{// Promisify version of the ngc compiler
+const ngc = async (args) => new Promise((resolve, reject)=>{// Promisify version of the ngc compiler
+  ngFsUtils.setFileSystem(new ngFsUtils.NodeJSFileSystem());
   let exitCode = require('@angular/compiler-cli/src/main').main(args);
   resolve(exitCode);
 });
@@ -62,6 +64,15 @@ const gulpHub = require('gulp-hub');
 const gulpCompodoc = require('@compodoc/gulp-compodoc');
 
 const yargs = require('yargs');
+const {
+  src,
+  dest,
+  task,
+  parallel,
+  series,
+  watch
+} = require('gulp');
+const { sequence } = require('@angular/animations');
 const argv = yargs
   .option('version', {
     alias: 'v',
@@ -178,36 +189,49 @@ const styleProcessor = (stylePath, ext, styleFile, callback) => {
   } else if (/\.css$/.test(ext[0])) {
     postProcessCss(styleFile);
   }
-};
+}; 
 
 /////////////////////////////////////////////////////////////////////////////
 // Cleaning Tasks
 /////////////////////////////////////////////////////////////////////////////
-gulp.task('clean:dist', () => {
-  return del(config.outputDir);
-});
+// task('clean:dist', () => {
+//   return del(config.outputDir);
+// });
 
-gulp.task('clean:build', () => {
-  return del(config.buildDir);
-});
+// task('clean:build', () => {
+//   return del(config.buildDir);
+// });
 
-gulp.task('clean:coverage', () => {
-  return del(config.coverageDir);
-});
+// task('clean:coverage', () => {
+//   return del(config.coverageDir);
+// });
 
-gulp.task('clean:doc', () => {
-  return del(`${config.outputDir}/doc`);
-});
+// task('clean:doc', () => {
+//   return del(`${config.outputDir}/doc`);
+// });
 
-gulp.task('clean', ['clean:dist', 'clean:coverage', 'clean:build']);
+// task('clean', ['clean:dist', 'clean:coverage', 'clean:build']);
 
-/////////////////////////////////////////////////////////////////////////////
-// Compilation Tasks
-/////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////
+// // Compilation Tasks
+// /////////////////////////////////////////////////////////////////////////////
 
-gulp.task('lint', (cb) => {
+// task('lint', (cb) => {
+//   pump([
+//     src(config.allTs),
+//     gulpTslint(
+//       {
+//         program: tslint.Linter.createProgram('./tsconfig.json'),
+//         formatter: 'verbose',
+//         configuration: 'tslint.json'
+//       }),
+//     gulpTslint.report()
+//   ], cb);
+// });
+
+function lint(cb) {
   pump([
-    gulp.src(config.allTs),
+    src(config.allTs),
     gulpTslint(
       {
         program: tslint.Linter.createProgram('./tsconfig.json'),
@@ -216,10 +240,24 @@ gulp.task('lint', (cb) => {
       }),
     gulpTslint.report()
   ], cb);
-});
-
+}
 // Inline Styles and Templates into components
-gulp.task('inline-templates', (cb) => {
+// task('inline-templates', (cb) => {
+//   const options = {
+//     base: `${config.buildDir}`,
+//     styleProcessor: styleProcessor,
+//     useRelativePaths: true
+//   };
+//   pump(
+//     [
+//       src(config.allTs),
+//       gulpInlineNgTemplate(options),
+//       dest(`${config.buildDir}`)
+//     ],
+//     cb);
+// });
+
+function inlineTemplates(cb) {
   const options = {
     base: `${config.buildDir}`,
     styleProcessor: styleProcessor,
@@ -227,30 +265,54 @@ gulp.task('inline-templates', (cb) => {
   };
   pump(
     [
-      gulp.src(config.allTs),
+      src(config.allTs),
       gulpInlineNgTemplate(options),
-      gulp.dest(`${config.buildDir}`)
+      dest(`${config.buildDir}`)
     ],
     cb);
-});
+}
 
 // Prepare files for compilation
-gulp.task('pre-compile', (cb) => {
-   pump([
-    gulp.src([config.allSrc]),
-    gulp.dest(config.buildDir)
+// task('pre-compile', (cb) => {
+//    pump([
+//     src([config.allSrc]),
+//     dest(config.buildDir)
+//     ], cb);
+// });
+function preCompile(cb) {
+  pump([
+    src([config.allSrc]),
+    dest(config.buildDir)
     ], cb);
-});
+}
+// task('ng-compile',() => {
+//   return Promise.resolve()
+//     // Compile to ES5.
+//     .then(() => ngc(['--project',`${buildFolder}/tsconfig.lib.es5.json`])
+//       .then(exitCode => exitCode === 0 ? Promise.resolve() : Promise.reject())
+//       .then(() => fancyLog('ES5 compilation succeeded.'))
+//     )
+//     // Compile to ES2015.
+//     .then(() => ngc(['--project',`${buildFolder}/tsconfig.lib.json`])
+//       .then(exitCode => exitCode === 0 ? Promise.resolve() : Promise.reject())
+//       .then(() => fancyLog('ES2015 compilation succeeded.'))
+//     )
+//     .catch(e => {
+//       fancyLog(acolors.red('ng-compilation failed. See below for errors.\n'));
+//       fancyLog(acolors.red(e));
+//       process.exit(1);
+//     });
+// });
 
-gulp.task('ng-compile',() => {
+async function ngCompile() {
   return Promise.resolve()
     // Compile to ES5.
-    .then(() => ngc(['--project',`${buildFolder}/tsconfig.lib.es5.json`])
+    .then(async () =>  await ngc(['--project',`${buildFolder}/tsconfig.lib.es5.json`])
       .then(exitCode => exitCode === 0 ? Promise.resolve() : Promise.reject())
       .then(() => fancyLog('ES5 compilation succeeded.'))
     )
     // Compile to ES2015.
-    .then(() => ngc(['--project',`${buildFolder}/tsconfig.lib.json`])
+    .then(async () => await ngc(['--project',`${buildFolder}/tsconfig.lib.json`])
       .then(exitCode => exitCode === 0 ? Promise.resolve() : Promise.reject())
       .then(() => fancyLog('ES2015 compilation succeeded.'))
     )
@@ -259,45 +321,88 @@ gulp.task('ng-compile',() => {
       fancyLog(acolors.red(e));
       process.exit(1);
     });
-});
+}
 
 // Lint, Prepare Build, , Sass to css, Inline templates & Styles and Ng-Compile
-gulp.task('compile', (cb) => {
-  runSequence('lint', 'pre-compile', 'inline-templates', 'ng-compile', cb);
-});
+// task('compile', (cb) => {
+//   runSequence('lint', 'pre-compile', 'inline-templates', 'ng-compile', cb);
+// });
+
+// const compile = sequence(lint, preCompile, inlineTemplates, ngCompile)
+function compile(cb) {
+  sequence(lint, preCompile, inlineTemplates, ngCompile, cb);
+}
 
 // Build the 'dist' folder (without publishing it to NPM)
-gulp.task('build', ['clean'], (cb) => {
-  runSequence('compile', 'test', 'npm-package', 'rollup-bundle', cb);
-});
+// task('build', ['clean'], (cb) => {
+//   runSequence('compile', 'test', 'npm-package', 'rollup-bundle', cb);
+// });
 
+// Optimize images
+//const build = parallel(compile, test, npmPackage, rollupBundle)
+function build(cb) {
+  series(compile, test, npmPackage, rollupBundle, cb);
+}
 // Same as 'build' but without cleaning temp folders (to avoid breaking demo app, if currently being served)
-gulp.task('build-watch', (cb) => {
-  runSequence('compile', 'test', 'npm-package', 'rollup-bundle', cb);
-});
+// task('build-watch', (cb) => {
+//   runSequence('compile', 'test', 'npm-package', 'rollup-bundle', cb);
+// });
 
-// Same as 'build-watch' but without running tests
-gulp.task('build-watch-no-tests', (cb) => {
-  runSequence('compile', 'npm-package', 'rollup-bundle', cb);
-});
+// // Same as 'build-watch' but without running tests
+// task('build-watch-no-tests', (cb) => {
+//   runSequence('compile', 'npm-package', 'rollup-bundle', cb);
+// });
 
-// Watch changes on (*.ts, *.html, *.sass) and Re-build library
-gulp.task('build:watch', ['build-watch'], () => {
-  gulp.watch([config.allTs, config.allHtml, config.allSass], ['build-watch']);
-});
+// // Watch changes on (*.ts, *.html, *.sass) and Re-build library
+// task('build:watch', ['build-watch'], () => {
+//   watch([config.allTs, config.allHtml, config.allSass], ['build-watch']);
+// });
 
-// Watch changes on (*.ts, *.html, *.sass) and Re-build library (without running tests)
-gulp.task('build:watch-fast', ['build-watch-no-tests'], () => {
-  gulp.watch([config.allTs, config.allHtml, config.allSass], ['build-watch-no-tests']);
-});
+// // Watch changes on (*.ts, *.html, *.sass) and Re-build library (without running tests)
+// task('build:watch-fast', ['build-watch-no-tests'], () => {
+//   watch([config.allTs, config.allHtml, config.allSass], ['build-watch-no-tests']);
+// // });
 
 
-/////////////////////////////////////////////////////////////////////////////
-// Packaging Tasks
-/////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////
+// // Packaging Tasks
+// /////////////////////////////////////////////////////////////////////////////
 
-// Prepare 'dist' folder for publication to NPM
-gulp.task('npm-package', (cb) => {
+// // Prepare 'dist' folder for publication to NPM
+// task('npm-package', (cb) => {
+//   let pkgJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+//   let targetPkgJson = {};
+//   let fieldsToCopy = ['version', 'description', 'keywords', 'author', 'repository', 'license', 'bugs', 'homepage'];
+
+//   targetPkgJson['name'] = config.libraryName;
+
+//   //only copy needed properties from project's package json
+//   fieldsToCopy.forEach((field) => { targetPkgJson[field] = pkgJson[field]; });
+
+//   targetPkgJson['main'] = `./bundles/${config.unscopedLibraryName}.umd.js`;
+//   targetPkgJson['module'] = `./esm5/${config.unscopedLibraryName}.es5.js`;
+//   targetPkgJson['es2015'] = `./esm2015/${config.unscopedLibraryName}.js`;
+//   targetPkgJson['typings'] = `./${config.unscopedLibraryName}.d.ts`;
+
+//   // defines project's dependencies as 'peerDependencies' for final users
+//   targetPkgJson.peerDependencies = {};
+//   Object.keys(pkgJson.dependencies).forEach((dependency) => {
+//     // versions are defined as '^' by default, but you can customize it by editing "dependenciesRange" in '.yo-rc.json' file
+//     targetPkgJson.peerDependencies[dependency] = `^${pkgJson.dependencies[dependency].replace(/[\^~><=]/,'')}`;
+//   });
+
+//   // copy the needed additional files in the 'dist' folder
+//   pump(
+//     [
+//       src(['README.md', 'LICENSE', 'CHANGELOG.md', 
+//       `${config.buildDir}/lib-es5/**/*.d.ts`,
+//       `${config.buildDir}/lib-es5/**/*.metadata.json`]),
+//       gulpFile('package.json', JSON.stringify(targetPkgJson, null, 2)),
+//       dest(config.outputDir)
+//     ], cb);
+// });
+
+function npmPackage(cb) {
   let pkgJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
   let targetPkgJson = {};
   let fieldsToCopy = ['version', 'description', 'keywords', 'author', 'repository', 'license', 'bugs', 'homepage'];
@@ -322,16 +427,19 @@ gulp.task('npm-package', (cb) => {
   // copy the needed additional files in the 'dist' folder
   pump(
     [
-      gulp.src(['README.md', 'LICENSE', 'CHANGELOG.md', 
+      src(['README.md', 'LICENSE', 'CHANGELOG.md', 
       `${config.buildDir}/lib-es5/**/*.d.ts`,
       `${config.buildDir}/lib-es5/**/*.metadata.json`]),
       gulpFile('package.json', JSON.stringify(targetPkgJson, null, 2)),
-      gulp.dest(config.outputDir)
+      dest(config.outputDir)
     ], cb);
-});
-
+}
 // Bundles the library as UMD/FESM bundles using RollupJS
-gulp.task('rollup-bundle', (cb) => {
+// task('rollup-bundle', (cb) => {
+  
+// });
+
+function rollupBundle () {
   return Promise.resolve()
   // Bundle lib.
   .then(() => {
@@ -449,34 +557,32 @@ gulp.task('rollup-bundle', (cb) => {
     fancyLog(acolors.red(e));
     process.exit(1);
   });
-});
-
-
+}
 /////////////////////////////////////////////////////////////////////////////
 // Documentation Tasks
 /////////////////////////////////////////////////////////////////////////////
-gulp.task('build:doc', (cb) => {
-  pump([
-    gulp.src('src/**/*.ts'),
-    gulpCompodoc({
-      tsconfig: 'src/tsconfig.lib.json',
-      hideGenerator:true,
-      disableCoverage: true,
-      output: `${config.outputDemoDir}/doc/`
-    })
-  ], cb);
-});
+// task('build:doc', (cb) => {
+//   pump([
+//     src('src/**/*.ts'),
+//     gulpCompodoc({
+//       tsconfig: 'src/tsconfig.lib.json',
+//       hideGenerator:true,
+//       disableCoverage: true,
+//       output: `${config.outputDemoDir}/doc/`
+//     })
+//   ], cb);
+// });
 
-gulp.task('serve:doc', ['clean:doc'], (cb) => {
-  pump([
-    gulp.src('src/**/*.ts'),
-    gulpCompodoc({
-      tsconfig: 'src/tsconfig.lib.json',
-      serve: true,
-      output: `${config.outputDir}/doc/`
-    })
-  ], cb);
-});
+// task('serve:doc', ['clean:doc'], (cb) => {
+//   pump([
+//     src('src/**/*.ts'),
+//     gulpCompodoc({
+//       tsconfig: 'src/tsconfig.lib.json',
+//       serve: true,
+//       output: `${config.outputDir}/doc/`
+//     })
+//   ], cb);
+// });
 
 
 
@@ -499,204 +605,217 @@ const execDemoCmd = (args,opts) => {
   }
 };
 
-gulp.task('test:demo', () => {
-  return execExternalCmd('npm', 'run test', { cwd: `${config.demoDir}`});
-});
+// task('test:demo', () => {
+//   return execExternalCmd('npm', 'run test', { cwd: `${config.demoDir}`});
+// });
 
-gulp.task('serve:demo', () => {
-  return execDemoCmd('serve --aot --proxy-config proxy.conf.json', { cwd: `${config.demoDir}` });
-});
+// task('serve:demo', () => {
+//   return execDemoCmd('serve --aot --proxy-config proxy.conf.json', { cwd: `${config.demoDir}` });
+// });
 
-gulp.task('serve:demo-hmr', () => {
-  return execDemoCmd('serve --configuration hmr --aot --proxy-config proxy.conf.json', { cwd: `${config.demoDir}` });
-});
+// task('serve:demo-hmr', () => {
+//   return execDemoCmd('serve --configuration hmr --aot --proxy-config proxy.conf.json', { cwd: `${config.demoDir}` });
+// });
 
-gulp.task('build:demo', () => {
-  return execDemoCmd(`build --preserve-symlinks --prod --base-href /mat-markdown-editor/ --deploy-url /mat-markdown-editor/`, { cwd: `${config.demoDir}`});
-});
+// task('build:demo', () => {
+//   return execDemoCmd(`build --preserve-symlinks --prod --base-href /mat-markdown-editor/ --deploy-url /mat-markdown-editor/`, { cwd: `${config.demoDir}`});
+// });
 
-gulp.task('serve:demo-ssr',['build:demo-ssr'], () => {
-  return execExternalCmd('node', 'dist/server.js', { cwd: `${config.demoDir}` });
-});
+// task('serve:demo-ssr',['build:demo-ssr'], () => {
+//   return execExternalCmd('node', 'dist/server.js', { cwd: `${config.demoDir}` });
+// });
 
-gulp.task('build:demo-ssr', () => {
-  return execDemoCmd(`build --preserve-symlinks --prod`, { cwd: `${config.demoDir}`})
-    .then(() => execDemoCmd(`run mat-markdown-editor-demo:server`, { cwd: `${config.demoDir}` }))
-    .then(() => execCmd('webpack', '--config webpack.server.config.js --progress --colors', { cwd: `${config.demoDir}` }, `/${config.demoDir}`))
-    .catch(e => {
-      fancyLog(acolors.red(`build:demo-ssr command failed. See below for errors.\n`));
-      fancyLog(acolors.red(e));
-      process.exit(1);
-    });
-});
+// task('build:demo-ssr', () => {
+//   return execDemoCmd(`build --preserve-symlinks --prod`, { cwd: `${config.demoDir}`})
+//     .then(() => execDemoCmd(`run mat-markdown-editor-demo:server`, { cwd: `${config.demoDir}` }))
+//     .then(() => execCmd('webpack', '--config webpack.server.config.js --progress --colors', { cwd: `${config.demoDir}` }, `/${config.demoDir}`))
+//     .catch(e => {
+//       fancyLog(acolors.red(`build:demo-ssr command failed. See below for errors.\n`));
+//       fancyLog(acolors.red(e));
+//       process.exit(1);
+//     });
+// });
 
-gulp.task('push:demo', () => {
-  return execCmd('ngh',`--dir ${config.outputDemoDir} --message="chore(demo): :rocket: deploy new version"`);
-});
+// task('push:demo', () => {
+//   return execCmd('ngh',`--dir ${config.outputDemoDir} --message="chore(demo): :rocket: deploy new version"`);
+// });
 
-gulp.task('deploy:demo', (cb) => {
-  runSequence('build:demo', 'build:doc', 'push:demo', cb);
-});
+// task('deploy:demo', (cb) => {
+//   runSequence('build:demo', 'build:doc', 'push:demo', cb);
+// });
 
 
 /////////////////////////////////////////////////////////////////////////////
 // Test Tasks
 /////////////////////////////////////////////////////////////////////////////
-gulp.task('test', (cb) => {
+// task('test', (cb) => {
+//   let isTravis = !!process.env.TRAVIS;
+//   return jestCli.runCLI({ config: require('./package.json').jest, coverage: true, runInBand: isTravis, ci: isTravis }, ".").then(({ results }) => {
+//     if (!results.success) throw new Error('There are test failures!');
+//   });
+// });
+function test(cb) {
   let isTravis = !!process.env.TRAVIS;
   return jestCli.runCLI({ config: require('./package.json').jest, coverage: true, runInBand: isTravis, ci: isTravis }, ".").then(({ results }) => {
     if (!results.success) throw new Error('There are test failures!');
   });
-});
+}
+// task('test:ci', ['clean'], (cb) => {
+//   runSequence('compile', 'test');
+// });
 
-gulp.task('test:ci', ['clean'], (cb) => {
-  runSequence('compile', 'test');
-});
+// task('test:watch', (cb) => {
+//   return jestCli.runCLI({ config: require('./package.json').jest, watch: true }, ".").then(({ results }) => {
+//     if (!results.success) throw new Error('There are test failures!');
+//   });
+// });
 
-gulp.task('test:watch', (cb) => {
-  return jestCli.runCLI({ config: require('./package.json').jest, watch: true }, ".").then(({ results }) => {
-    if (!results.success) throw new Error('There are test failures!');
-  });
-});
-
-gulp.task('test:watch-no-cc', (cb) => {//no coverage (useful for debugging failing tests in browser)
-  return jestCli.runCLI({ config: require('./package.json').jest, watch: true, coverage:false }, ".").then(({ results }) => {
-    if (!results.success) throw new Error('There are test failures!');
-  });
-});
+// task('test:watch-no-cc', (cb) => {//no coverage (useful for debugging failing tests in browser)
+//   return jestCli.runCLI({ config: require('./package.json').jest, watch: true, coverage:false }, ".").then(({ results }) => {
+//     if (!results.success) throw new Error('There are test failures!');
+//   });
+// });
 
 /////////////////////////////////////////////////////////////////////////////
 // Release Tasks
 /////////////////////////////////////////////////////////////////////////////
-gulp.task('changelog', (cb) => {
-  pump(
-    [
-      gulp.src('CHANGELOG.md', { buffer: false }),
-      gulpConventionalChangelog({ preset: 'angular', releaseCount: 0 }),
-      gulp.dest('./')
-    ], cb);
-});
+// // task('changelog', (cb) => {
+// //   pump(
+// //     [
+// //       src('CHANGELOG.md', { buffer: false }),
+// //       gulpConventionalChangelog({ preset: 'angular', releaseCount: 0 }),
+// //       dest('./')
+// //     ], cb);
+// // });
 
-gulp.task('github-release', (cb) => {
-  if (!argv.ghToken && !process.env.CONVENTIONAL_GITHUB_RELEASER_TOKEN) {
-    fancyLog(acolors.red(`You must specify a Github Token via '--ghToken' or set environment variable 'CONVENTIONAL_GITHUB_RELEASER_TOKEN' to allow releasing on Github`));
-    throw new Error(`Missing '--ghToken' argument and environment variable 'CONVENTIONAL_GITHUB_RELEASER_TOKEN' not set`);
-  }
+// // task('github-release', (cb) => {
+// //   if (!argv.ghToken && !process.env.CONVENTIONAL_GITHUB_RELEASER_TOKEN) {
+// //     fancyLog(acolors.red(`You must specify a Github Token via '--ghToken' or set environment variable 'CONVENTIONAL_GITHUB_RELEASER_TOKEN' to allow releasing on Github`));
+// //     throw new Error(`Missing '--ghToken' argument and environment variable 'CONVENTIONAL_GITHUB_RELEASER_TOKEN' not set`);
+// //   }
 
-  conventionalGithubReleaser(
-    {
-      type: 'oauth',
-      token: argv.ghToken || process.env.CONVENTIONAL_GITHUB_RELEASER_TOKEN
-    },
-    { preset: 'angular' },
-    cb);
-});
+// //   conventionalGithubReleaser(
+// //     {
+// //       type: 'oauth',
+// //       token: argv.ghToken || process.env.CONVENTIONAL_GITHUB_RELEASER_TOKEN
+// //     },
+// //     { preset: 'angular' },
+// //     cb);
+// // });
 
-gulp.task('bump-version', (cb) => {
-  if (!argv.version) {
-    fancyLog(acolors.red(`You must specify which version to bump to (Possible values: 'major', 'minor', and 'patch')`));
-    throw new Error(`Missing '--version' argument`);
-  }
+// // task('bump-version', (cb) => {
+// //   if (!argv.version) {
+// //     fancyLog(acolors.red(`You must specify which version to bump to (Possible values: 'major', 'minor', and 'patch')`));
+// //     throw new Error(`Missing '--version' argument`);
+// //   }
 
-  pump(
-    [
-      gulp.src('./package.json'),
-      gulpBump({ type: argv.version }),
-      gulp.dest('./'),
-    ], cb);
-});
+// //   pump(
+// //     [
+// //       src('./package.json'),
+// //       gulpBump({ type: argv.version }),
+// //       dest('./'),
+// //     ], cb);
+// // });
 
-gulp.task('commit-changes', (cb) => {
-  let version = getPackageJsonVersion();
-  pump(
-    [
-      gulp.src('.'),
-      gulpGit.add(),
-      gulpGit.commit(`chore(release): bump version number to ${version}`)
-    ], cb);
-});
+// // task('commit-changes', (cb) => {
+// //   let version = getPackageJsonVersion();
+// //   pump(
+// //     [
+// //       src('.'),
+// //       gulpGit.add(),
+// //       gulpGit.commit(`chore(release): bump version number to ${version}`)
+// //     ], cb);
+// // });
 
-gulp.task('push-changes', (cb) => {
-  gulpGit.push('origin', 'master', cb);
-});
+// // task('push-changes', (cb) => {
+// //   gulpGit.push('origin', 'master', cb);
+// // });
 
-gulp.task('create-new-tag', (cb) => {
-  let version = `v${getPackageJsonVersion()}`;
-  gulpGit.tag(version, `chore(release): :sparkles: :tada: create tag for version v${version}`, (error) => {
-    if (error) {
-      return cb(error);
-    }
-    gulpGit.push('origin', 'master', { args: '--tags' }, cb);
-  });
+// // task('create-new-tag', (cb) => {
+// //   let version = `v${getPackageJsonVersion()}`;
+// //   gulpGit.tag(version, `chore(release): :sparkles: :tada: create tag for version v${version}`, (error) => {
+// //     if (error) {
+// //       return cb(error);
+// //     }
+// //     gulpGit.push('origin', 'master', { args: '--tags' }, cb);
+// //   });
 
-});
+// // });
 
-// Build and then Publish 'dist' folder to NPM
-gulp.task('npm-publish', ['build'], () => {
-  return execExternalCmd('npm',`publish ${config.outputDir} --access public`)
-});
+// // // Build and then Publish 'dist' folder to NPM
+// // task('npm-publish', ['build'], () => {
+// //   return execExternalCmd('npm',`publish ${config.outputDir} --access public`)
+// // });
 
-// Perfom pre-release checks (no actual release)
-gulp.task('pre-release', cb => {
-  readyToRelease();
-  cb();
-});
+// // // Perfom pre-release checks (no actual release)
+// // task('pre-release', cb => {
+// //   readyToRelease();
+// //   cb();
+// // });
 
-gulp.task('release', (cb) => {
-  fancyLog('# Performing Pre-Release Checks...');
-  if (!readyToRelease()) {
-    fancyLog(acolors.red('# Pre-Release Checks have failed. Please fix them and try again. Aborting...'));
-    cb();
-  }
-  else {
-    fancyLog(acolors.green('# Pre-Release Checks have succeeded. Continuing...'));
-    runSequence(
-      'bump-version',
-      'changelog',
-      'commit-changes',
-      'push-changes',
-      'create-new-tag',
-      'github-release',
-      'npm-publish',
-      'deploy:demo',
-      (error) => {
-        if (error) {
-          fancyLog(acolors.red(error.message));
-        } else {
-          fancyLog(acolors.green('RELEASE FINISHED SUCCESSFULLY'));
-        }
-        cb(error);
-      });
-  }
-});
+// // task('release', (cb) => {
+// //   fancyLog('# Performing Pre-Release Checks...');
+// //   if (!readyToRelease()) {
+// //     fancyLog(acolors.red('# Pre-Release Checks have failed. Please fix them and try again. Aborting...'));
+// //     cb();
+// //   }
+// //   else {
+// //     fancyLog(acolors.green('# Pre-Release Checks have succeeded. Continuing...'));
+// //     runSequence(
+// //       'bump-version',
+// //       'changelog',
+// //       'commit-changes',
+// //       'push-changes',
+// //       'create-new-tag',
+// //       'github-release',
+// //       'npm-publish',
+// //       'deploy:demo',
+// //       (error) => {
+// //         if (error) {
+// //           fancyLog(acolors.red(error.message));
+// //         } else {
+// //           fancyLog(acolors.green('RELEASE FINISHED SUCCESSFULLY'));
+// //         }
+// //         cb(error);
+// //       });
+// //   }
+// // });
 
 
-/////////////////////////////////////////////////////////////////////////////
-// Utility Tasks
-/////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////
+// // Utility Tasks
+// /////////////////////////////////////////////////////////////////////////////
 
-// Link 'dist' folder (create a local 'ng-scrollreveal' package that symlinks to it)
-// This way, we can have the demo project declare a dependency on 'ng-scrollreveal' (as it should)
-// and, thanks to 'npm link ng-scrollreveal' on demo project, be sure to always use the latest built
-// version of the library ( which is in 'dist/' folder)
-gulp.task('link', () => {
-  return execExternalCmd('npm', 'link', { cwd: `${config.outputDir}` });
-});
+// // Link 'dist' folder (create a local 'ng-scrollreveal' package that symlinks to it)
+// // This way, we can have the demo project declare a dependency on 'ng-scrollreveal' (as it should)
+// // and, thanks to 'npm link ng-scrollreveal' on demo project, be sure to always use the latest built
+// // version of the library ( which is in 'dist/' folder)
+// task('link', () => {
+//   return execExternalCmd('npm', 'link', { cwd: `${config.outputDir}` });
+// });
 
-gulp.task('unlink', () => {
-  return execExternalCmd('npm', 'unlink', { cwd: `${config.outputDir}` });
-});
+// task('unlink', () => {
+//   return execExternalCmd('npm', 'unlink', { cwd: `${config.outputDir}` });
+// });
 
-// Upload code coverage report to coveralls.io (will be triggered by Travis CI on successful build)
-gulp.task('coveralls', (cb) => {
-  pump(
-    [
-      gulp.src(`${config.coverageDir}/lcov.info`),
-      gulpCoveralls()
-    ], cb);
-});
+// // Upload code coverage report to coveralls.io (will be triggered by Travis CI on successful build)
+// task('coveralls', (cb) => {
+//   pump(
+//     [
+//       src(`${config.coverageDir}/lcov.info`),
+//       gulpCoveralls()
+//     ], cb);
+// });
 
-gulp.task('default', ['build']);
+//task('default', ['build']);
 
 // Load additional tasks
-gulpHub(['./config/gulp-tasks/*.js']);
+// gulpHub(['./config/gulp-tasks/*.js']);
+// task('default', series(compile, test, npmPackage,rollupBundle));
+// task('build', series(compile, test, npmPackage,rollupBundle));
+// //exports.build = series(compile, test, npmPackage, rollupBundle);
+// task('server', series('build', function(){
+//   browser.init({server: './_site', port: port});
+// }));
+exports.default =  series(lint, preCompile, inlineTemplates, ngCompile);
+exports.build = series(lint, preCompile, inlineTemplates, ngCompile, test, npmPackage, rollupBundle);
