@@ -16,6 +16,7 @@
     "genDir": "../tmp/lib-gen-dir/",
     "flatModuleOutFile": "mat-markdown-editor.js",
     "flatModuleId": "mat-markdown-editor",
-    "annotateForClosureCompiler": true
+    "annotateForClosureCompiler": true,
+    "enableIvy": false
   }
 }
