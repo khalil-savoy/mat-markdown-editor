@@ -30,6 +30,7 @@
     "check-travis": " travis-status --repo=michaeldoye/mat-markdown-editor --branch=master --fail-pending || echo 'Not yet passing'"
   },
   "dependencies": {
+    "@angular-devkit/schematics": "^9.1.13",
     "@angular/animations": "~9.1.13",
     "@angular/cdk": "^9.2.4",
     "@angular/cli": "^9.1.15",
