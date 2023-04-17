@@ -133,7 +133,7 @@ var MatMarkdownEditorComponent = /** @class */ (function () {
                 }), 100);
             }
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     /**
@@ -313,7 +313,7 @@ var MatMarkdownEditorComponent = /** @class */ (function () {
                             multi: true,
                         },
                     ],
-                },] },
+                },] }
     ];
     /** @nocollapse */
     MatMarkdownEditorComponent.ctorParameters = function () { return [
@@ -348,7 +348,7 @@ var LibService = /** @class */ (function () {
         return "Hello " + (name || 'Stanger') + "!";
     };
     LibService.decorators = [
-        { type: Injectable },
+        { type: Injectable }
     ];
     /** @nocollapse */
     LibService.ctorParameters = function () { return []; };
@@ -431,7 +431,7 @@ var MaterialModule = /** @class */ (function () {
                         MatToolbarModule,
                         MatTooltipModule,
                     ],
-                },] },
+                },] }
     ];
     return MaterialModule;
 }());
@@ -577,7 +577,7 @@ var EditorToolbarComponent = /** @class */ (function () {
                     selector: 'mat-markdown-editor-toolbar',
                     template: "\n    <mat-toolbar\n      [color]=\"options.toolbarColor\"\n      *ngIf=\"!options.hideToolbar && options?.mode != 'preview'\"\n      fxLayout=\"row\"\n      fxLayoutAlign=\"start center\"\n      fxLayoutGap=\"5px\"\n    >\n      <div class=\"btn-group\">\n        <button\n          mat-icon-button\n          type=\"button\"\n          matTooltip=\"Bold\"\n          (click)=\"insertContent('Bold')\"\n          *ngIf=\"!options?.hideIcons?.Bold\"\n        >\n          <mat-icon aria-label=\"bold\">format_bold</mat-icon>\n        </button>\n        <button\n          mat-icon-button\n          type=\"button\"\n          matTooltip=\"Italic\"\n          (click)=\"insertContent('Italic')\"\n          *ngIf=\"!options?.hideIcons?.Italic\"\n        >\n          <mat-icon aria-label=\"italic\">format_italic</mat-icon>\n        </button>\n        <button\n          mat-icon-button\n          type=\"button\"\n          matTooltip=\"Heading\"\n          (click)=\"insertContent('Heading')\"\n          *ngIf=\"!options?.hideIcons?.Heading\"\n        >\n          <mat-icon aria-label=\"italic\">format_size</mat-icon>\n        </button>\n        <button\n          mat-icon-button\n          type=\"button\"\n          matTooltip=\"Refrence\"\n          (click)=\"insertContent('Reference')\"\n          *ngIf=\"!options?.hideIcons?.Reference\"\n        >\n          <mat-icon aria-label=\"quote\">format_quote</mat-icon>\n        </button>\n        <mat-divider [vertical]=\"true\"></mat-divider>\n      </div>\n\n      <div class=\"btn-group\">\n        <button\n          mat-icon-button\n          type=\"button\"\n          matTooltip=\"Link\"\n          (click)=\"insertContent('Link')\"\n          *ngIf=\"!options?.hideIcons?.Link\"\n        >\n          <mat-icon aria-label=\"link\">link</mat-icon>\n        </button>\n        <button\n          mat-icon-button\n          type=\"button\"\n          matTooltip=\"Image\"\n          (click)=\"insertContent('Image')\"\n          *ngIf=\"!options?.hideIcons?.Image\"\n        >\n          <mat-icon aria-label=\"Image\">photo</mat-icon>\n        </button>\n        <mat-divider [vertical]=\"true\"></mat-divider>\n      </div>\n\n      <div class=\"btn-group\">\n        <button\n          mat-icon-button\n          type=\"button\"\n          matTooltip=\"Unordered List\"\n          (click)=\"insertContent('Ul')\"\n          *ngIf=\"!options?.hideIcons?.Ul\"\n        >\n          <mat-icon aria-label=\"Unordered List\">\n            format_list_bulleted\n          </mat-icon>\n        </button>\n        <button\n          mat-icon-button\n          type=\"button\"\n          matTooltip=\"Ordered List\"\n          (click)=\"insertContent('Ol')\"\n          *ngIf=\"!options?.hideIcons?.Ol\"\n        >\n          <mat-icon aria-label=\"Unordered List\">\n            format_list_numbered\n          </mat-icon>\n        </button>\n        <button\n          mat-icon-button\n          type=\"button\"\n          matTooltip=\"Code Block\"\n          (click)=\"insertContent('Code')\"\n          *ngIf=\"!options?.hideIcons?.Code\"\n        >\n          <mat-icon aria-label=\"code\">code</mat-icon>\n        </button>\n        <mat-divider [vertical]=\"true\"></mat-divider>\n      </div>\n\n      <div class=\"btn-group\">\n        <button\n          mat-icon-button\n          type=\"button\"\n          [matTooltip]=\"previewIsOpen ? 'Hide Preview' : 'Show Preview'\"\n          (click)=\"togglePreview()\"\n          *ngIf=\"!options?.hideIcons?.TogglePreview\"\n        >\n          <mat-icon aria-label=\"Unordered List\">{{\n            previewIsOpen ? 'visibility_off' : 'visibility'\n          }}</mat-icon>\n        </button>\n      </div>\n\n      <span fxFlex></span>\n\n      <div class=\"btn-group pull-right hide-split\">\n        <button\n          mat-icon-button\n          type=\"button\"\n          matTooltip=\"Full Screen Mode\"\n          [class.active]=\"isFullScreen\"\n          (click)=\"fullScreen()\"\n          *ngIf=\"!options?.hideIcons?.FullScreen && !isFullScreen\"\n        >\n          <mat-icon aria-label=\"fullscreen\">fullscreen</mat-icon>\n        </button>\n        <button\n          mat-icon-button\n          type=\"button\"\n          matTooltip=\"Exit Full Screen Mode\"\n          [class.active]=\"isFullScreen\"\n          (click)=\"fullScreen()\"\n          *ngIf=\"!options?.hideIcons?.FullScreen && isFullScreen\"\n        >\n          <mat-icon aria-label=\"fullscreen\">fullscreen_exit</mat-icon>\n        </button>\n      </div>\n    </mat-toolbar>\n  ",
                     styles: ["\n\n  "],
-                },] },
+                },] }
     ];
     /** @nocollapse */
     EditorToolbarComponent.ctorParameters = function () { return [
@@ -625,7 +625,7 @@ var MatMarkdownEditorModule = /** @class */ (function () {
                     ],
                     exports: [MatMarkdownEditorComponent],
                     declarations: [MatMarkdownEditorComponent, EditorToolbarComponent],
-                },] },
+                },] }
     ];
     return MatMarkdownEditorModule;
 }());
