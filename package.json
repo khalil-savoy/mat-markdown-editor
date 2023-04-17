@@ -1,7 +1,7 @@
 {
   "name": "mat-markdown-editor",
   "description": "A forked version of Material design markdown editor. demo was Updated angular version to 9",
-  "version": "0.0.9",
+  "version": "0.0.91",
   "homepage": "https://github.com/michaeldoye/mat-markdown-editor",
   "author": {
     "name": "Michael Doye",
@@ -32,14 +32,14 @@
   "dependencies": {
     "@angular-devkit/schematics": "^10.2.4",
     "@angular/animations": "~10.2.5",
-    "@angular/cdk": "^9.2.4",
+    "@angular/cdk": "~10.2.5",
     "@angular/cli": "^10.2.4",
     "@angular/common": "10.2.5",
     "@angular/compiler": "~10.2.5",
     "@angular/core": "10.2.5",
     "@angular/flex-layout": "^9.0.0-beta.29",
     "@angular/forms": "^10.2.5",
-    "@angular/material": "^9.2.4",
+    "@angular/material": "~10.2.5",
     "@angular/platform-browser": "~10.2.5",
     "@angular/platform-browser-dynamic": "~10.2.5",
     "@angular/router": "~10.2.5",
