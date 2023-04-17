@@ -319,7 +319,7 @@ MatMarkdownEditorComponent.decorators = [
                         multi: true,
                     },
                 ],
-            },] },
+            },] }
 ];
 /** @nocollapse */
 MatMarkdownEditorComponent.ctorParameters = () => [
@@ -348,7 +348,7 @@ class LibService {
     }
 }
 LibService.decorators = [
-    { type: Injectable },
+    { type: Injectable }
 ];
 /** @nocollapse */
 LibService.ctorParameters = () => [];
@@ -428,7 +428,7 @@ MaterialModule.decorators = [
                     MatToolbarModule,
                     MatTooltipModule,
                 ],
-            },] },
+            },] }
 ];
 
 /**
@@ -705,7 +705,7 @@ EditorToolbarComponent.decorators = [
                 styles: [`
 
   `],
-            },] },
+            },] }
 ];
 /** @nocollapse */
 EditorToolbarComponent.ctorParameters = () => [
@@ -747,7 +747,7 @@ MatMarkdownEditorModule.decorators = [
                 ],
                 exports: [MatMarkdownEditorComponent],
                 declarations: [MatMarkdownEditorComponent, EditorToolbarComponent],
-            },] },
+            },] }
 ];
 
 /**
