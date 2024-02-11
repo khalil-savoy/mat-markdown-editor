@@ -83,7 +83,7 @@
     "gulp-tslint": "8.1.4",
     "html-loader": "0.5.5",
     "jest": "24.3.1",
-    "jest-preset-angular": "9.0.7",
+    "jest-preset-angular": "12.2.6",
     "lodash": "4.17.11",
     "postcss": "7.0.14",
     "postcss-strip-inline-comments": "0.1.5",
